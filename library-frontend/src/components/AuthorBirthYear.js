@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { EDIT_AUTHOR } from '../queries'
 
-const AuthorBirthYear = () => {
-  const [name, setName] = useState('')
+const AuthorBirthYear = ({ authors }) => {
+  const [name, setName] = useState('Select author')
   const [year, setYear] = useState('')
 
   const [changeYear, result] = useMutation(EDIT_AUTHOR)
@@ -17,9 +17,14 @@ const AuthorBirthYear = () => {
   const submit = (event) => {
     event.preventDefault()
 
+    if (name === 'Select author') {
+      console.log('Please select author first')
+      return
+    }
+
     changeYear({ variables: { name, year: Number(year) } })
 
-    setName('')
+    setName('Select author')
     setYear('')
   }
 
@@ -28,11 +33,14 @@ const AuthorBirthYear = () => {
       <h2>Set birthyear</h2>
       <form onSubmit={submit}>
         <div>
-          Name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
+          <select value={name} onChange={({ target }) => setName(target.value)}>
+            <option>Select author</option>
+            {authors.map((author) => (
+              <option key={author.id} value={author.name}>
+                {author.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           Born
