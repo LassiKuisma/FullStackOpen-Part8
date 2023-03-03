@@ -69,7 +69,9 @@ const resolvers = {
     },
     allAuthors: async () => Author.find({}),
   },
-  // TODO: author field on book query
+  Book: {
+    author: async (root) => Author.findById(root.author),
+  },
   Author: {
     bookCount: async ({ name }) => {
       // TODO: bookCount on author
@@ -109,8 +111,22 @@ const resolvers = {
       return book
     },
     editAuthor: async (root, args) => {
-      // TODO: editAuthor mutation
-      return null
+      const author = await Author.findOne({ name: args.name })
+      author.born = Number(args.setBornTo)
+
+      try {
+        author.save()
+      } catch (error) {
+        throw new GraphQLError('Saving author failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name,
+            error,
+          },
+        })
+      }
+
+      return author
     },
   },
 }
