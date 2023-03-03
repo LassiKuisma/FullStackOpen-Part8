@@ -80,30 +80,27 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
-      /*
-      If we can't find a matching author from db, then insert a new record
-      into database. However, we don't know anything about the author other
-      than the name, so we will just have to make do with only that.
-
-      And that's why the filter object is same as the update object :)
-       */
-      const author = await Author.findOneAndUpdate(
-        { name: args.author },
-        { name: args.author },
-        {
-          new: true,
-          upsert: true,
-          runValidators: true,
+      const getOrCreateAuthor = async (name) => {
+        const author = await Author.findOne({ name })
+        if (author) {
+          return author
         }
-      ).catch((error) => {
-        throw new GraphQLError('Getting author info failed', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.author,
-            error,
-          },
+
+        const created = new Author({ name })
+        await created.save().catch((error) => {
+          throw new GraphQLError('Failed to create author', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              invalidArgs: name,
+              error,
+            },
+          })
         })
-      })
+
+        return created
+      }
+
+      const author = await getOrCreateAuthor(args.author)
 
       const book = new Book({ ...args, author })
       await book.save()
