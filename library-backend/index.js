@@ -107,17 +107,32 @@ const resolvers = {
       const author = await getOrCreateAuthor(args.author)
 
       const book = new Book({ ...args, author })
-      await book.save()
+      await book.save().catch((error) => {
+        throw new GraphQLError('Failed to save book info', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error,
+          },
+        })
+      })
 
       return book
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name })
+      if (!author) {
+        throw new GraphQLError('Author not found', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name,
+          },
+        })
+      }
+
       author.born = Number(args.setBornTo)
 
-      try {
-        author.save()
-      } catch (error) {
+      author.save().catch((error) => {
         throw new GraphQLError('Saving author failed', {
           extensions: {
             code: 'BAD_USER_INPUT',
@@ -125,7 +140,7 @@ const resolvers = {
             error,
           },
         })
-      }
+      })
 
       return author
     },
