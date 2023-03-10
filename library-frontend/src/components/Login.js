@@ -10,6 +10,7 @@ const Login = ({ show, setToken, setPage }) => {
     onError: (error) => {
       console.log('error logging in:', error)
     },
+    refetchQueries: ['LoggedInUser'],
   })
 
   useEffect(() => {

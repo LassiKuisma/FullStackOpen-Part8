@@ -77,3 +77,13 @@ export const LOGIN = gql`
     }
   }
 `
+
+export const ME = gql`
+  query LoggedInUser {
+    me {
+      username
+      favouriteGenre
+      id
+    }
+  }
+`

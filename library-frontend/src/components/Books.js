@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS, ALL_GENRES } from '../queries'
 import { useState } from 'react'
+import BookList from './BookList'
 
 const GenreSelection = ({ genreQuery, setGenre }) => {
   if (genreQuery.loading) {
@@ -49,22 +50,7 @@ const Books = (props) => {
         In genre <b>{genreToShow}</b>
       </div>
 
-      <table>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>author</th>
-            <th>published</th>
-          </tr>
-          {books.map((book) => (
-            <tr key={book.title}>
-              <td>{book.title}</td>
-              <td>{book.author.name}</td>
-              <td>{book.published}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <BookList books={books} />
       <GenreSelection genreQuery={genresResult} setGenre={setGenreToShow} />
     </div>
   )
