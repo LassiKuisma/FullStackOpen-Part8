@@ -1,17 +1,8 @@
 import { useQuery } from '@apollo/client'
 import { ME } from '../queries'
 
-const RecommendedBooks = ({ show, token }) => {
+const RecommendedBooks = ({ show }) => {
   const userQuery = useQuery(ME)
-
-  /*
-  useEffect(() => {
-    if (!token) {
-      return
-    }
-    userQuery.refetch()
-  }, [token, userQuery])
-  */
 
   if (!show) {
     return null

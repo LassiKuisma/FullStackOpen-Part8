@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { LOGIN } from '../queries'
 
@@ -6,30 +6,36 @@ const Login = ({ show, setToken, setPage }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const [login, result] = useMutation(LOGIN, {
+  const [login] = useMutation(LOGIN, {
+    update: (_cache, { data }) => {
+      // Token must be set here (in update), as other queries require
+      // authorization header, such as logged-in user query.
+      // Setting token with onComplete or effect hook runs these queries
+      // before token is added to header.
+      const token = data.login.value
+      setToken(token)
+      localStorage.setItem('libraryapp-user-token', token)
+    },
     onError: (error) => {
       console.log('error logging in:', error)
     },
     refetchQueries: ['LoggedInUser'],
   })
 
-  useEffect(() => {
-    if (result.data) {
-      const token = result.data.login.value
-      setToken(token)
-      localStorage.setItem('libraryapp-user-token', token)
-    }
-  }, [result.data]) // eslint-disable-line
-
   const submit = async (event) => {
     event.preventDefault()
 
-    login({ variables: { username, password } })
+    const loginResult = await login({ variables: { username, password } })
+    if (loginResult.errors) {
+      console.log('error logging in!')
+    }
 
-    setUsername('')
-    setPassword('')
+    if (loginResult.data) {
+      setUsername('')
+      setPassword('')
 
-    setPage('authors')
+      setPage('authors')
+    }
   }
 
   if (!show) {
