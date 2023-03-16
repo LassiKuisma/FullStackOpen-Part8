@@ -21,7 +21,10 @@ const resolvers = {
       // TODO: filter by author
       return Book.find({})
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => {
+      console.log('All authors query')
+      return Author.find({})
+    },
     me: async (root, args, context) => {
       return context.currentUser
     },
@@ -30,9 +33,10 @@ const resolvers = {
     author: async (root) => Author.findById(root.author),
   },
   Author: {
-    bookCount: async ({ name }) => {
-      // TODO: bookCount on author
-      return 0
+    bookCount: async (root) => {
+      console.log('Book query')
+      const id = root._id
+      return await Book.count({ author: id })
     },
   },
   Mutation: {
