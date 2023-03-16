@@ -21,7 +21,9 @@ const resolvers = {
       // TODO: filter by author
       return Book.find({})
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => {
+      return Author.find({}).populate('books')
+    },
     me: async (root, args, context) => {
       return context.currentUser
     },
@@ -30,9 +32,8 @@ const resolvers = {
     author: async (root) => Author.findById(root.author),
   },
   Author: {
-    bookCount: async ({ name }) => {
-      // TODO: bookCount on author
-      return 0
+    bookCount: async (root) => {
+      return root.books.length
     },
   },
   Mutation: {
@@ -73,6 +74,15 @@ const resolvers = {
           extensions: {
             code: 'BAD_USER_INPUT',
             invalidArgs: args.title,
+            error,
+          },
+        })
+      })
+
+      author.books = author.books.concat(book)
+      await author.save().catch((error) => {
+        throw new GraphQLError('Failed to save author info', {
+          extensions: {
             error,
           },
         })
