@@ -16,6 +16,7 @@ const Authors = (props) => {
   }
 
   const authors = result.data.allAuthors
+  const loggedIn = props.token
 
   return (
     <div>
@@ -36,7 +37,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <AuthorBirthYear authors={authors} />
+      {loggedIn && <AuthorBirthYear authors={authors} />}
     </div>
   )
 }

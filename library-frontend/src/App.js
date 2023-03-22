@@ -68,7 +68,7 @@ const App = () => {
         {token && <button onClick={logout}>logout</button>}
       </div>
 
-      <Authors show={page === 'authors'} />
+      <Authors show={page === 'authors'} token={token} />
 
       <Books show={page === 'books'} />
 
